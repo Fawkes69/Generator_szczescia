@@ -47,18 +47,22 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
+            activeIcon: Icon(Icons.person_outline),
             label: 'Dane',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.music_note),
+            activeIcon: Icon(Icons.music_note_outlined),
             label: 'Muzyka',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.image),
+            activeIcon: Icon(Icons.image_outlined),
             label: 'Obrazy',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_view_rounded),
+            activeIcon: Icon(Icons.grid_view_outlined),
             label: 'Galeria',
           ),
         ],
@@ -107,6 +111,7 @@ class UserInputPage extends StatelessWidget {
                 label: Text('${mood.emoji} ${mood.displayName}'),
                 selected: userData.mood == mood,
                 onSelected: (_) => userData.updateMood(mood),
+                selectedColor: userData.favoriteColor.computeLuminance() > 0.5 ? userData.favoriteColor: userData.invertedColor,
               );
             }).toList(),
           ),
@@ -171,9 +176,10 @@ class UserInputPage extends StatelessWidget {
               Expanded(
                 child: Slider(
                   value: userData.tempo.toDouble(),
+                  activeColor: userData.favoriteColor.computeLuminance() > 0.5 ? Colors.black: userData.favoriteColor,
                   min: 10,
                   max: 100,
-                  divisions: 14,
+                  divisions: 9,
                   label: '${userData.tempo} %',
                   onChanged: (value) {
                     userData.updateTempo(value.toInt());
@@ -200,7 +206,16 @@ class UserInputPage extends StatelessWidget {
                 label: Text(theme),
                 selected: userData.imageTheme == theme,
                 onSelected: (_) => userData.updateTheme(theme),
-              );
+                selectedColor: userData.favoriteColor.computeLuminance() > 0.5 ? userData.favoriteColor: userData.invertedColor,
+                side: BorderSide(
+                  color: userData.imageTheme == theme
+                      ? (userData.favoriteColor.computeLuminance() > 0.5
+                      ? userData.favoriteColor
+                      : userData.invertedColor)
+                      : Colors.grey,
+                  width: 1.5,
+                ),
+                  );
             }).toList(),
           ),
           const SizedBox(height: 30),
@@ -208,7 +223,8 @@ class UserInputPage extends StatelessWidget {
           // Złożoność
           const Text('Złożoność generowania:', style: TextStyle(fontSize: 16)),
           const SizedBox(height: 10),
-          Slider(
+          Row(children: [Expanded(child: Slider(
+            activeColor: userData.favoriteColor.computeLuminance() > 0.5 ? Colors.black: userData.favoriteColor,
             value: userData.complexity,
             min: 0.1,
             max: 1.0,
@@ -216,6 +232,15 @@ class UserInputPage extends StatelessWidget {
             label: '${(userData.complexity * 100).toInt()}%',
             onChanged: userData.updateComplexity,
           ),
+          ),
+            const SizedBox(height: 10),
+            Text(
+              '${(userData.complexity * 100).toInt()} %',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+    ]
+    ,)
+
         ],
       ),
     );

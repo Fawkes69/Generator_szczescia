@@ -124,7 +124,7 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
         ),
       )
         ..pushStyle(textStyle)
-        ..addText('Dla: ${userData.name}');
+        ..addText('Specjalnie dla ciebie: ${userData.name}');
 
       final paragraph = paragraphBuilder.build()
         ..layout(ui.ParagraphConstraints(width: width.toDouble()));
@@ -280,7 +280,7 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
     // na potrzeby projektu nie ograniczałem się tylko do bieli, czerni i szarości
     // zamiast tego podzieliłem kolor użytkownika na 6 różnych odcieni dla zachowania wierności
     // Stopień 0 - praktycznie biały
-    // Stopień 5 - praktycznie kolor użytkownika
+    // Stopień 5 - lekko jaśniejszy odcień koloru użytkownika
     const int width = 400;
     const int height = 400;
 
@@ -301,7 +301,7 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
     ];
 
     // Podział płótna na rytmiczne pasy poziome i pionowe
-    final divisions = 4 + random.nextInt(5); // 4–8 podziałów
+    final divisions = 4 + (userData.complexity * 8).toInt(); // 4–12 podziałów
 
     // Pionowe pasy
     double xOffset = 0;
