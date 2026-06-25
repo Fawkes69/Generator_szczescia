@@ -1,0 +1,39 @@
+name: generator
+description: "ACAB"
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^5.2.1
+  provider: ^6.1.1
+  permission_handler: ^12.0.1
+  just_audio: ^0.10.5
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.0
+  image: ^4.1.4
+  flutter_colorpicker: ^1.0.3
+  vector_math: ^2.1.4
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sounds/a4.wav
+    - assets/sounds/b4.wav
+    - assets/sounds/c4.wav
+    - assets/sounds/d4.wav
+    - assets/sounds/f4.wav
+    - assets/sounds/g4.wav
+    - assets/sounds/a5.wav
+    - assets/sounds/b5.wav
+    - assets/sounds/c5.wav
+    - assets/sounds/d5.wav
+    - assets/sounds/f5.wav
+    - assets/sounds/g5.wav
