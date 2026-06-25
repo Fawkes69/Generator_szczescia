@@ -16,13 +16,15 @@ class MyApp extends StatelessWidget {
       create: (context) => UserData(),
       child: Consumer<UserData>(
         builder: (context, userData, child) {
+          final luminance = userData.favoriteColor.computeLuminance();
+          final isLightColor = luminance > 0.5;
           return MaterialApp(
             title: 'Generator szczęścia',
             theme: ThemeData(
               colorScheme: ColorScheme.light(
                 primary: userData.favoriteColor,
                 secondary: userData.favoriteColor,
-                surface: Colors.white,
+                surface: isLightColor ? userData.favoriteColor : userData.invertedColor,
               ),
               useMaterial3: true,
             ),
