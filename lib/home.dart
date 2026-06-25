@@ -26,17 +26,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserData>(context);
+    final bool isLightColor = userData.favoriteColor.computeLuminance() > 0.5;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Eksperymenty z Multimediami'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: userData.favoriteColor,
+        foregroundColor: isLightColor ? Colors.black : Colors.white,
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.green,
+        selectedItemColor: isLightColor ? userData.invertedColor : userData.favoriteColor,
+        unselectedItemColor: isLightColor ? userData.invertedColor : userData.favoriteColor,
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
@@ -130,6 +131,7 @@ class UserInputPage extends StatelessWidget {
                     ),
                     actions: [
                       TextButton(
+                        style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
                         onPressed: () => Navigator.pop(context),
                         child: const Text('OK'),
                       ),
@@ -192,7 +194,7 @@ class UserInputPage extends StatelessWidget {
           const SizedBox(height: 10),
           Wrap(
             spacing: 10,
-            children: ['Abstrakcyjny', 'Natura', 'Geometria', 'Kosmos', 'Woda']
+            children: ['Abstrakcyjny', 'Natura', 'Geometria', 'Kosmos', 'Woda','Unizm']
                 .map((theme) {
               return FilterChip(
                 label: Text(theme),

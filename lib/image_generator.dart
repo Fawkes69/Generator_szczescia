@@ -15,6 +15,11 @@ class ImageGeneratorPage extends StatefulWidget {
   State<ImageGeneratorPage> createState() => _ImageGeneratorPageState();
 }
 
+//mieszanie kolorów wykorzystane w modelu unizmitycznym
+Color shade(Color color, double amount) {
+  return Color.lerp(color, Colors.white, amount)!;
+}
+
 class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
   ui.Image? _generatedImage;
   bool _isGenerating = false;
@@ -97,6 +102,9 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
           break;
         case 'Woda':
           _drawWaterShape(canvas, paint, x, y, size, random);
+          break;
+        case 'Unizm':
+          _drawUnizmShape(canvas, paint, x, y, size, random,userData);
           break;
         default:
           _drawAbstractShape(canvas, paint, x, y, size, random);
@@ -256,6 +264,122 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
     }
 
     canvas.drawPath(path, wavePaint);
+  }
+
+  void _drawUnizmShape(
+      Canvas canvas,
+      Paint paint,
+      double x,
+      double y,
+      double size,
+      Random random,
+      dynamic userData,
+      ) {
+    // Unizm Strzemińskiego: kompozycja prostokątów bez dominanty,rytm poziomych i pionowych podziałów płaszczyzny
+    // Strzeminski unikał kompozycji skupionej w centrum
+    // na potrzeby projektu nie ograniczałem się tylko do bieli, czerni i szarości
+    // zamiast tego podzieliłem kolor użytkownika na 6 różnych odcieni dla zachowania wierności
+    // Stopień 0 - praktycznie biały
+    // Stopień 5 - praktycznie kolor użytkownika
+    const int width = 400;
+    const int height = 400;
+
+    // Tło prawie białe
+    final bgPaint = Paint()..color = shade(userData.favoriteColor, 0.95); // stopień 0
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+      bgPaint,
+    );
+
+    // Paleta unistyczna z zastosowaniem kolorów użytkownika
+    final palette = [
+      shade(userData.favoriteColor, 0.0), // stopień 5
+      shade(userData.favoriteColor, 0.2), // stopień 4
+      shade(userData.favoriteColor, 0.4), // stopień 3
+      shade(userData.favoriteColor, 0.6), // stopień 2
+      shade(userData.favoriteColor, 0.8), // stopień 1
+    ];
+
+    // Podział płótna na rytmiczne pasy poziome i pionowe
+    final divisions = 4 + random.nextInt(5); // 4–8 podziałów
+
+    // Pionowe pasy
+    double xOffset = 0;
+    for (int i = 0; i < divisions; i++) {
+      final stripWidth = width / divisions * (0.7 + random.nextDouble() * 0.6);
+      final rectPaint = Paint()
+        ..color = palette[random.nextInt(palette.length)];
+
+      // Każdy pas może być pełnej wysokości lub częściowej
+      final topOffset = random.nextDouble() * height * 0.3;
+      final bottomOffset = random.nextDouble() * height * 0.3;
+
+      canvas.drawRect(
+        Rect.fromLTWH(
+          xOffset,
+          topOffset,
+          stripWidth.clamp(10, width.toDouble()),
+          height - topOffset - bottomOffset,
+        ),
+        rectPaint,
+      );
+
+      xOffset += width / divisions;
+      if (xOffset >= width) break;
+    }
+
+    // Poziome pasy nakładające się na siebie
+    double yOffset = 0;
+    final hDivisions = 3 + random.nextInt(3);
+    for (int i = 0; i < hDivisions; i++) {
+      final stripHeight = height / hDivisions * (0.3 + random.nextDouble() * 0.5);
+      final rectPaint = Paint()
+        ..color = palette[random.nextInt(palette.length)].withValues(alpha: 0.4);
+
+      canvas.drawRect(
+        Rect.fromLTWH(
+          0,
+          yOffset,
+          width.toDouble(),
+          stripHeight.clamp(5, height.toDouble()),
+        ),
+        rectPaint,
+      );
+
+      yOffset += height / hDivisions;
+      if (yOffset >= height) break;
+    }
+
+    // Mocne prostokąty bez centrum — charakterystyczny element Unizmu
+    final blockCount = 5 + random.nextInt(6);
+    for (int i = 0; i < blockCount; i++) {
+      final bx = random.nextDouble() * width * 0.8;
+      final by = random.nextDouble() * height * 0.8;
+      final bw = 20.0 + random.nextDouble() * (width * 0.4);
+      final bh = 10.0 + random.nextDouble() * (height * 0.25);
+
+      final blockPaint = Paint()
+        ..color = palette[random.nextInt(palette.length)].withValues(alpha: 0.85);
+
+      canvas.drawRect(
+        Rect.fromLTWH(bx, by, bw, bh),
+        blockPaint,
+      );
+    }
+
+    // Cienkie linie podziału
+    final linePaint = Paint()
+      ..color = userData.favoriteColor.withValues(alpha: 0.25)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final lineCount = 3 + random.nextInt(4);
+    for (int i = 0; i < lineCount; i++) {
+      final lx = random.nextDouble() * width;
+      canvas.drawLine(Offset(lx, 0), Offset(lx, height.toDouble()), linePaint);
+      final ly = random.nextDouble() * height;
+      canvas.drawLine(Offset(0, ly), Offset(width.toDouble(), ly), linePaint);
+    }
   }
 
   Future<void> _saveImageLocally(UserData userData) async {
@@ -443,7 +567,8 @@ class _ImageGeneratorPageState extends State<ImageGeneratorPage> {
                     label: Text(_isSaving ? 'ZAPISYWANIE...' : 'Zapisz lokalnie'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-                      side: BorderSide(color: userData.favoriteColor),
+                      backgroundColor: userData.favoriteColor,
+                      foregroundColor: userData.invertedColor.withValues(alpha: 75),
                     ),
                   ),
                 ],
